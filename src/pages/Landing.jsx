@@ -41,12 +41,11 @@ const features = [
 
 const Landing = () => {
   const [activeFeature, setActiveFeature] = useState(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [email, setEmail] = useState('');
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showSignInModal, setShowSignInModal] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -54,6 +53,16 @@ const Landing = () => {
   const heroRef = useRef();
   const dashboardRef = useRef();
   const footerRef = useRef();
+
+  // Redirect to dashboard if user is logged in
+  useEffect(() => {
+    if (user) {
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, navigate]);
 
   const handleLogout = async () => {
     try {
@@ -219,28 +228,28 @@ const Landing = () => {
             <div className="relative">
               <button 
                 className="p-3 rounded-lg bg-[#CFAB8D] text-white hover:bg-opacity-90 transition-all focus:outline-none relative z-50 shadow-md flex items-center justify-center"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => setShowAuthModal(!showAuthModal)}
                 aria-label="Toggle menu"
-                aria-expanded={isMenuOpen}
+                aria-expanded={showAuthModal}
               >
-                {isMenuOpen ? (
+                {showAuthModal ? (
                   <FaTimes className="w-6 h-6" />
                 ) : (
                   <FaBars className="w-6 h-6" />
                 )}
               </button>
               {/* Backdrop */}
-              {isMenuOpen && (
+              {showAuthModal && (
                 <div 
                   className="fixed inset-0 bg-blur bg-opacity-50 backdrop-blur-sm z-40 transition-opacity"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => setShowAuthModal(false)}
                 />
               )}
               
               {/* Modal */}
               <div 
-                className={`fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                onClick={() => setIsMenuOpen(false)}
+                className={`fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300 ${showAuthModal ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                onClick={() => setShowAuthModal(false)}
               >
                 <div 
                   className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md mx-4 transform transition-all duration-300"
@@ -249,13 +258,10 @@ const Landing = () => {
                   {user ? (
                     <div className="text-center">
                       <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">Welcome, {user.displayName || 'User'}</h2>
-                      <p className="text-gray-600 mb-6">You're signed in to your account</p>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-600 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                      >
-                        Sign Out
-                      </button>
+                      <p className="text-gray-600 mb-6">Taking you to your dashboard...</p>
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-[#CFAB8D] h-full rounded-full animate-pulse"></div>
+                      </div>
                     </div>
                   ) : (
                     <>
@@ -288,36 +294,6 @@ const Landing = () => {
                             type="email"
                             placeholder="Email address"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CFAB8D] focus:border-transparent outline-none transition-all"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={isLoading}
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className="w-full bg-[#CFAB8D] text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CFAB8D] disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                          {isLoading ? 'Sending link...' : 'Get sign-in link'}
-                        </button>
-                      </form>
-
-                        <div className="relative">
-                          <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
-                          </div>
-                          <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or continue with email</span>
-                          </div>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <div>
-                            <input
-                              type="email"
-                              placeholder="Email address"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CFAB8D] focus:border-transparent outline-none transition-all"
                               required
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
@@ -385,7 +361,7 @@ const Landing = () => {
                 if (user) {
                   navigate('/dashboard');
                 } else {
-                  setShowSignInModal(true);
+                  setShowAuthModal(true);
                 }
               }}
               whileHover={{ scale: 1.02 }}
@@ -501,7 +477,13 @@ const Landing = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => navigate('/dashboard')}
+                onClick={() => {
+                  if (user) {
+                    navigate('/dashboard');
+                  } else {
+                    setShowAuthModal(true);
+                  }
+                }}
                 className="px-4 py-2 bg-[#CFAB8D] text-white rounded-lg text-sm font-medium hover:bg-[#15434a] transition-colors shadow"
               >
                 Get Started with PerspectiveX
