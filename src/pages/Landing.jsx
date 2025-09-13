@@ -185,14 +185,6 @@ const Landing = () => {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  position: 'fixed',
-                  top: '16px',
-                  right: '16px',
-                  zIndex: 1000
-                }}
               >
                 {isMenuOpen ? (
                   <FaTimes className="w-6 h-6" />
