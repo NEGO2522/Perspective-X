@@ -2,11 +2,11 @@
 
 A modern web application that leverages generative AI to analyze and compare global news, offering users a multi-faceted perspective on how different countries report on the same events.
 
-[Live Demo](https://your-live-demo-link.com) &lt;-- *Replace with your actual deployment link*
+[Live Demo](https://perspective-x.vercel.app/) &lt;-- *Replace with your actual deployment link*
 
 ---
 
-![Perspective-X Dashboard](https://i.imgur.com/your-screenshot.png) &lt;-- *Replace with a screenshot of your app*
+![Perspective-X Dashboard](src/assets/phot.png) &lt;-- *Replace with a screenshot of your app*
 
 ## Key Features
 

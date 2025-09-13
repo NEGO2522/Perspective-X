@@ -54,16 +54,6 @@ const Landing = () => {
   const dashboardRef = useRef();
   const footerRef = useRef();
 
-  // Redirect to dashboard if user is logged in
-  useEffect(() => {
-    if (user) {
-      const timer = setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [user, navigate]);
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -258,10 +248,13 @@ const Landing = () => {
                   {user ? (
                     <div className="text-center">
                       <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">Welcome, {user.displayName || 'User'}</h2>
-                      <p className="text-gray-600 mb-6">Taking you to your dashboard...</p>
-                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                        <div className="bg-[#CFAB8D] h-full rounded-full animate-pulse"></div>
-                      </div>
+                      <p className="text-gray-600 mb-6">You're signed in to your account</p>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-600 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   ) : (
                     <>
