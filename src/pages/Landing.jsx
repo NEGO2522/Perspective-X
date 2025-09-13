@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { FaGlobeAmericas, FaArrowRight, FaSearch, FaNewspaper, FaChartLine, FaUsers, FaClock, FaEye, FaBars, FaTimes, FaGoogle } from 'react-icons/fa';
 import { signInWithGoogle, sendSignInLink, isSignInLinkUrl, completeSignInWithEmailLink } from '../firebase/firebase';
 import { motion } from 'framer-motion';
@@ -332,16 +333,18 @@ const Landing = () => {
               whileTap={{ scale: 0.98 }}
               className="px-6 py-3 bg-[#CFAB8D] text-white rounded-lg font-medium flex items-center space-x-2 transition-all duration-200 hover:bg-opacity-90"
             >
-              <span>Explore Stories</span>
+              <span>Get Started</span>
               <FaArrowRight className="w-3.5 h-3.5" />
             </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 rounded-lg font-medium border border-[#CFAB8D] text-[#2D2D2D] hover:bg-[#CFAB8D] hover:bg-opacity-10 transition-all"
-            >
-              How It Works
-            </motion.button>
+            <Link to="/about">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 rounded-lg font-medium border border-[#CFAB8D] text-[#2D2D2D] hover:bg-[#CFAB8D] hover:bg-opacity-10 transition-all"
+              >
+                About Us
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
       </main>
