@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaGlobeAmericas, FaArrowRight, FaSearch, FaNewspaper, FaChartLine, FaUsers, FaClock, FaEye, FaBars, FaTimes } from 'react-icons/fa';
+import { FaGlobeAmericas, FaArrowRight, FaSearch, FaNewspaper, FaChartLine, FaUsers, FaClock, FaEye, FaBars, FaTimes, FaGoogle } from 'react-icons/fa';
+import { signInWithGoogle, sendSignInLink, isSignInLinkUrl, completeSignInWithEmailLink } from '../firebase/firebase';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -38,6 +39,10 @@ const features = [
 const Landing = () => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [showEmailSent, setShowEmailSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const container = useRef();
   const heroRef = useRef();
   const dashboardRef = useRef();
@@ -110,6 +115,53 @@ const Landing = () => {
     });
   }, { scope: container });
 
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      await sendSignInLink(email);
+      setShowEmailSent(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Google Sign In
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('');
+      setIsLoading(true);
+      await signInWithGoogle();
+      setIsMenuOpen(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check for email sign-in link on component mount
+  useEffect(() => {
+    if (isSignInLinkUrl(window.location.href)) {
+      const email = window.localStorage.getItem('emailForSignIn');
+      if (email) {
+        completeSignInWithEmailLink(email, window.location.href)
+          .then(() => {
+            window.localStorage.removeItem('emailForSignIn');
+            window.location.href = '/';
+          })
+          .catch((error) => {
+            setError(error.message);
+          });
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#ECEEDF] text-[#2D2D2D]" ref={container}>
       {/* Navigation */}
@@ -170,47 +222,78 @@ const Landing = () => {
                     <p className="text-gray-500">Sign in to access your account</p>
                   </div>
                   
-                  <form className="space-y-5">
-                    <div>
-                      <input
-                        type="email"
-                        placeholder="Email address"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CFAB8D] focus:border-transparent outline-none transition-all"
-                        required
-                      />
+                  {showEmailSent ? (
+                    <div className="text-center space-y-4">
+                      <div className="text-green-600 bg-green-50 p-4 rounded-lg">
+                        <p>We've sent a sign-in link to your email.</p>
+                        <p className="font-medium">{email}</p>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Check your email and click the link to sign in.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowEmailSent(false);
+                          setEmail('');
+                        }}
+                        className="mt-4 text-[#CFAB8D] hover:underline"
+                      >
+                        Back to sign in
+                      </button>
                     </div>
-                    
-                    <div>
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CFAB8D] focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm">
-                      <label className="flex items-center">
-                        <input type="checkbox" className="rounded border-gray-300 text-[#CFAB8D] focus:ring-[#CFAB8D]" />
-                        <span className="ml-2 text-gray-600">Remember me</span>
-                      </label>
-                      <a href="#" className="text-[#CFAB8D] hover:underline">Forgot password?</a>
-                    </div>
-                    
-                    <button
-                      type="submit"
-                      className="w-full bg-[#CFAB8D] text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CFAB8D]"
-                    >
-                      Sign In
-                    </button>
-                    
-                    <p className="text-center text-sm text-gray-500">
-                      Don't have an account?{' '}
-                      <a href="#" className="text-[#CFAB8D] font-medium hover:underline">
-                        Sign up
-                      </a>
-                    </p>
-                  </form>
+                  ) : (
+                    <>
+                      <div className="space-y-5">
+                        <button
+                          type="button"
+                          onClick={handleGoogleSignIn}
+                          disabled={isLoading}
+                          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CFAB8D]"
+                        >
+                          <FaGoogle className="text-red-500" />
+                          Continue with Google
+                        </button>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                          </div>
+                          <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+                          </div>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                          <div>
+                            <input
+                              type="email"
+                              placeholder="Email address"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CFAB8D] focus:border-transparent outline-none transition-all"
+                              required
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              disabled={isLoading}
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-[#CFAB8D] text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CFAB8D] disabled:opacity-70 disabled:cursor-not-allowed"
+                          >
+                            {isLoading ? 'Sending link...' : 'Get sign-in link'}
+                          </button>
+                        </form>
+
+                        {error && (
+                          <div className="text-red-500 text-sm text-center p-2 bg-red-50 rounded-lg">
+                            {error}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
