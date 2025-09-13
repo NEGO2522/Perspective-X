@@ -328,14 +328,16 @@ const Landing = () => {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="flex flex-wrap justify-center gap-4"
           >
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-[#CFAB8D] text-white rounded-lg font-medium flex items-center space-x-2 transition-all duration-200 hover:bg-opacity-90"
-            >
-              <span>Get Started</span>
-              <FaArrowRight className="w-3.5 h-3.5" />
-            </motion.button>
+            <Link to="/dashboard">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 bg-[#CFAB8D] text-white rounded-lg font-medium flex items-center space-x-2 transition-all duration-200 hover:bg-opacity-90"
+              >
+                <span>Get Started</span>
+                <FaArrowRight className="w-3.5 h-3.5" />
+              </motion.button>
+            </Link>
             <Link to="/about">
               <motion.button 
                 whileHover={{ scale: 1.02 }}

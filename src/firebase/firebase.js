@@ -5,7 +5,7 @@ import {
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
-  signInWithEmailLink, 
+  signOut, 
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink as signInWithEmailLinkAuth
@@ -37,6 +37,17 @@ export const signInWithGoogle = async () => {
     return result.user;
   } catch (error) {
     console.error("Error signing in with Google:", error);
+    throw error;
+  }
+};
+
+// Sign Out
+export const signOutUser = async () => {
+  try {
+    await signOut(auth);
+    window.location.href = '/';
+  } catch (error) {
+    console.error("Error signing out:", error);
     throw error;
   }
 };
