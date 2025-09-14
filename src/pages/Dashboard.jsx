@@ -24,10 +24,22 @@ const Dashboard = ({ user }) => {
   const container = useRef();
 
   useGSAP(() => {
-    if (!isLoading) {
-        gsap.from('.chat-bubble:last-child', { opacity: 0, y: 20, duration: 0.5 });
+    if (!isLoading && currentChat?.length > 0) {
+      const lastBubble = container.current?.querySelector('.chat-bubble:last-child');
+      if (lastBubble) {
+        gsap.fromTo(
+          lastBubble,
+          { opacity: 0, y: 20 },
+          { 
+            opacity: 1, 
+            y: 0, 
+            duration: 0.5,
+            ease: 'power2.out'
+          }
+        );
+      }
     }
-  }, { dependencies: [currentChat], scope: container });
+  }, { dependencies: [currentChat, isLoading], scope: container });
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('chatHistory');

@@ -18,6 +18,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+  client_id: import.meta.env.VITE_FIREBASE_CLIENT_ID
+});
+
+// Add scopes if needed
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
 
 export const signInWithGoogle = () => {
   return signInWithPopup(auth, googleProvider);

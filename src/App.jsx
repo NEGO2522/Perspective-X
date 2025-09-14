@@ -4,6 +4,7 @@ import Landing from './pages/Landing';
 import AboutUs from './components/AboutUs';
 import Dashboard from './pages/Dashboard';
 import { useAuth } from './hooks/useAuth';
+import MobileBlocker from './components/MobileBlocker';
 
 function App() {
   const { user, loading } = useAuth();
@@ -13,17 +14,19 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing user={user} />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route 
-          path="/dashboard" 
-          element={user ? <Dashboard /> : <Navigate to="/" replace />}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <MobileBlocker>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing user={user} />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route 
+            path="/dashboard" 
+            element={user ? <Dashboard /> : <Navigate to="/" replace />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </MobileBlocker>
   );
 }
 
